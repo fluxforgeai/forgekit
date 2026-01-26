@@ -1,0 +1,52 @@
+---
+description: End session and create all handoff documentation
+---
+Session is ending. Please complete all session end tasks:
+
+1. **Save active plan file (if exists):**
+
+   - Check `~/.claude/plans/` for recent plan files (modified today)
+   - If found, copy to `~/docs/plans/PLAN_{datetime}_{original_name}.md`
+   - This preserves implementation plans between sessions
+2. **Create new handoff document:**
+
+   - Get current date/time: `date '+%Y-%m-%d_%H%M'`
+   - Create file: `NEXT_SESSION_PROMPT_{datetime}.md`
+   - Include updated "START HERE" section
+   - Update status: what was completed this session
+   - Update priorities: what's next
+   - Include any new insights or decisions
+   - **Reference any active plan file** (from step 1)
+3. **Create session summary:**
+
+   - Create file: `SESSION_SUMMARY_{datetime}.md`
+   - Document what was accomplished
+   - List issues encountered
+   - Record decisions made
+   - Include metrics and statistics
+   - Reference plan file if applicable
+4. **Update CLAUDE.md:**
+
+   - Edit line 24 to change `@NEXT_SESSION_PROMPT_*.md`
+   - Point to the NEW handoff file you just created
+   - Update "Last Updated" timestamp at bottom
+   - Update "Last Session" description
+5. **Archive old handoff:**
+
+   - Move old `NEXT_SESSION_PROMPT_*.md` to `docs/archive/sessions/`
+   - Keep only the NEW handoff in root directory
+
+**IMPORTANT**:
+
+- Save plan file FIRST (step 1)
+- Create new files NEXT (steps 2-3)
+- THEN update CLAUDE.md to point to them (step 4)
+- This ensures CLAUDE.md never points to non-existent files
+
+After completing all tasks, provide a summary showing:
+
+- ✅ Plan file saved (if any)
+- ✅ New handoff filename
+- ✅ New summary filename
+- ✅ CLAUDE.md updated (show new line 24)
+- ✅ Old handoff archived location

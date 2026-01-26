@@ -1,0 +1,18 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "forgekit"
+version = "0.1.0"
+description = "ForgeKit - AI Engineering Skills Toolkit by FluxForge AI"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Proprietary"}
+authors = [{name = "Johan Genis"}]
+
+[project.scripts]
+forgekit = "forgekit.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/forgekit"]
