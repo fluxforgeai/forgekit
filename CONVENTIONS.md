@@ -10,8 +10,9 @@ your-project/
 ├── docs/
 │   ├── incidents/                 # /incident writes here
 │   ├── investigations/            # /investigate writes here
+│   ├── blueprints/                # /blueprint writes implementation specs here
 │   ├── RCAs/                      # /rca-bugfix writes RCA reports here
-│   ├── prompts/                   # /rca-bugfix writes fix prompts here
+│   ├── prompts/                   # /rca-bugfix and /blueprint write prompts here
 │   ├── analysis/                  # /analyze writes reports here
 │   ├── design/                    # /design writes reports here
 │   ├── research/                  # /research writes findings here
@@ -42,10 +43,11 @@ Skills communicate through shared documents:
 
 | Artifact | Written By | Read By |
 |----------|-----------|---------|
+| `docs/blueprints/*.md` | blueprint | plan mode |
 | `docs/RCAs/*.md` | rca-bugfix | investigate, analyze |
 | `docs/incidents/*.md` | incident | investigate, analyze |
 | `docs/analysis/*.md` | analyze | design, investigate |
-| `docs/design/*.md` | design | (implementation) |
-| `docs/research/*.md` | research | investigate, design |
+| `docs/design/*.md` | design | blueprint, (implementation) |
+| `docs/research/*.md` | research | investigate, design, blueprint |
 | `system-map.md` | analyze | analyze (refreshed each run) |
-| `docs/prompts/*.md` | rca-bugfix | plan mode |
+| `docs/prompts/*.md` | rca-bugfix, blueprint | plan mode |

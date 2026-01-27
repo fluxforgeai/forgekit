@@ -6,15 +6,63 @@ ForgeKit is a closed-source, cross-platform AI engineering skills toolkit that p
 
 ## Skills
 
-| Skill | Command | Purpose |
-|-------|---------|---------|
-| **incident** | `/incident {desc}` | Document what happened (factual incident record) |
-| **investigate** | `/investigate {report}` | Deep investigation into why it happened |
-| **rca-bugfix** | `/rca-bugfix {issue}` | Root cause analysis + fix prompt generation |
-| **watchdog** | `/watchdog {desc}` | Autonomous background log monitoring |
-| **analyze** | `/analyze {mode} [scope]` | Strategic system analysis (health, risk, patterns, component, architecture) |
-| **design** | `/design {mode} {topic}` | Research-driven architectural design analysis |
-| **research** | `/research {question}` | Topic research with documented findings |
+| Skill | Command | Pipeline | Purpose |
+|-------|---------|----------|---------|
+| **incident** | `/incident {desc}` | Reactive | Document what happened (factual incident record) |
+| **investigate** | `/investigate {report}` | Reactive | Deep investigation into why it happened |
+| **rca-bugfix** | `/rca-bugfix {issue}` | Reactive | Root cause analysis + fix prompt generation |
+| **watchdog** | `/watchdog {desc}` | Reactive | Autonomous background log monitoring |
+| **analyze** | `/analyze {mode} [scope]` | Either | Strategic system analysis (health, risk, patterns, component, architecture) |
+| **design** | `/design {mode} {topic}` | Either | Research-driven architectural design analysis |
+| **research** | `/research {question}` | Proactive | Topic research with documented findings |
+| **blueprint** | `/blueprint {feature}` | Proactive | Transform design/research into implementation spec + prompt |
+
+## Pipelines
+
+ForgeKit skills are organized into two pipelines that converge at `/plan` mode:
+
+### Reactive Pipeline (Something broke)
+
+```
+/watchdog → /incident → /investigate → /rca-bugfix → /plan
+```
+
+| Step | Skill | Artifact |
+|------|-------|----------|
+| 1 | `/watchdog` | Telegram alert (auto-detected issue) |
+| 2 | `/incident` | `docs/incidents/*.md` |
+| 3 | `/investigate` | `docs/investigations/*.md` |
+| 4 | `/rca-bugfix` | `docs/RCAs/*.md` + `docs/prompts/*.md` |
+| 5 | `/plan` | `docs/plans/*.md` (implementation plan) |
+
+### Proactive Pipeline (Building something new)
+
+```
+/research → /design → /blueprint → /plan
+```
+
+| Step | Skill | Artifact |
+|------|-------|----------|
+| 1 | `/research` | `docs/research/*.md` |
+| 2 | `/design` | `docs/design/*.md` |
+| 3 | `/blueprint` | `docs/blueprints/*.md` + `docs/prompts/*.md` |
+| 4 | `/plan` | `docs/plans/*.md` (implementation plan) |
+
+### Convergence Points
+
+Both pipelines produce a `docs/prompts/*.md` file that feeds into `/plan` mode. The reactive pipeline generates a fix prompt (from `/rca-bugfix`), while the proactive pipeline generates a feature prompt (from `/blueprint`).
+
+`/analyze` is a strategic skill that feeds into either pipeline — its findings can trigger `/design` (proactive) or `/investigate` (reactive) depending on what's discovered.
+
+### When to Use Which Pipeline
+
+| Situation | Pipeline | Start With |
+|-----------|----------|------------|
+| Production incident or bug | Reactive | `/incident` or `/watchdog` |
+| New feature or migration | Proactive | `/research` |
+| Performance investigation | Reactive | `/investigate` |
+| Architecture change | Proactive | `/research` or `/design` |
+| Unknown system state | Either | `/analyze` |
 
 ## Session Management Commands
 
@@ -59,6 +107,7 @@ ForgeKit installs via symlinks. When you run `forgekit init`, it creates:
 your-project/.claude/
 ├── settings.json          ← Your project (unchanged)
 ├── skills/                ← Symlink → forgekit/skills/
+│   ├── blueprint/
 │   ├── incident/
 │   ├── investigate/
 │   ├── rca-bugfix/

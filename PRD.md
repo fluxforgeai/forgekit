@@ -97,6 +97,7 @@ The autonomous AI agent market is projected to reach $8.5B by 2026 (Deloitte). M
 | SK-013 | `/design impact` | Assess blast radius of a proposed change | P1 |
 | SK-014 | `/design pattern` | Explain and assess applicability of a design pattern | P2 |
 | SK-015 | `/research` | Topic research with documented findings and sources | P0 |
+| SK-019 | `/blueprint` | Transform design/research output into implementation spec + prompt for `/plan` | P0 |
 
 #### 4.1.3 Session Management
 
@@ -158,7 +159,7 @@ The autonomous AI agent market is projected to reach $8.5B by 2026 (Deloitte). M
 ## 6. Success Metrics
 
 ### Phase 1 (Development)
-- [x] All 7 skills portable across projects via symlinks
+- [x] All 8 skills portable across projects via symlinks
 - [x] CLI tool functional (7 commands)
 - [x] Zero project-specific references in skills
 
@@ -191,7 +192,7 @@ The autonomous AI agent market is projected to reach $8.5B by 2026 (Deloitte). M
 
 ### Key Differentiators
 
-1. **Integrated pipeline**: Skills chain together (watchdog -> incident -> investigate -> rca-bugfix -> plan)
+1. **Dual pipelines**: Reactive (watchdog -> incident -> investigate -> rca-bugfix -> plan) and Proactive (research -> design -> blueprint -> plan) converge at `/plan`
 2. **Interactive methodology**: Checkpoints adapt to user context (not one-shot templates)
 3. **Design escalation**: Analysis findings automatically suggest architectural exploration
 4. **Institutional memory**: Shared artifacts accumulate knowledge across sessions

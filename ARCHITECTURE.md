@@ -49,7 +49,8 @@ fluxforgeai/forgekit/
 ├── pyproject.toml                      # Python package definition
 ├── .gitignore
 │
-├── skills/                             # The 7 operational skills
+├── skills/                             # The 8 operational skills
+│   ├── blueprint/SKILL.md            #   Design-to-spec for proactive pipeline
 │   ├── incident/SKILL.md              #   Incident documentation
 │   ├── investigate/SKILL.md           #   Deep investigation
 │   ├── rca-bugfix/SKILL.md            #   Root cause analysis + fix prompts
@@ -99,27 +100,28 @@ fluxforgeai/forgekit/
 Skills are markdown files with optional YAML frontmatter. Each skill defines a methodology that the AI assistant follows.
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                     SKILLS LAYER                          │
-│                                                          │
-│  Tactical Pipeline:                                      │
-│  /watchdog ──► /incident ──► /investigate ──► /rca-bugfix│
-│       │                                          │       │
-│       │ (autonomous)              (generates fix prompt)  │
-│       ▼                                          ▼       │
-│  Telegram alerts                           /plan mode    │
-│                                                          │
-│  Strategic Layer:                                        │
-│  /analyze ──► /design ──► /plan mode                     │
-│       │                                                  │
-│       └──► /research                                     │
-│                                                          │
-│  Session Management:                                     │
-│  /session-start ──► (work) ──► /session-end              │
-│                                  │                       │
-│                                  ▼                       │
-│                          /verify-session                  │
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│                        SKILLS LAYER                               │
+│                                                                   │
+│  Reactive Pipeline:                                               │
+│  /watchdog ──► /incident ──► /investigate ──► /rca-bugfix ──┐    │
+│       │                                       (fix prompt)   │    │
+│       │ (autonomous)                                         │    │
+│       ▼                                                      ▼    │
+│  Telegram alerts                                        /plan mode│
+│                                                              ▲    │
+│  Proactive Pipeline:                                         │    │
+│  /research ──► /design ──► /blueprint ──────────────────────┘    │
+│                              (spec + prompt)                      │
+│                                                                   │
+│  Strategic: /analyze ──► feeds into either pipeline               │
+│                                                                   │
+│  Session Management:                                              │
+│  /session-start ──► (work) ──► /session-end                       │
+│                                  │                                │
+│                                  ▼                                │
+│                          /verify-session                           │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 **Skill Format**:
@@ -140,12 +142,13 @@ description: "When this skill should be used"
 
 | Artifact Path | Written By | Read By |
 |--------------|-----------|---------|
+| `docs/blueprints/*.md` | blueprint | plan mode |
 | `docs/RCAs/*.md` | rca-bugfix | investigate, analyze |
 | `docs/incidents/*.md` | incident | investigate, analyze |
 | `docs/analysis/*.md` | analyze | design |
-| `docs/design/*.md` | design | (implementation) |
-| `docs/research/*.md` | research | investigate, design |
-| `docs/prompts/*.md` | rca-bugfix | plan mode |
+| `docs/design/*.md` | design | blueprint, (implementation) |
+| `docs/research/*.md` | research | investigate, design, blueprint |
+| `docs/prompts/*.md` | rca-bugfix, blueprint | plan mode |
 | `system-map.md` | analyze | analyze (refreshed each run) |
 
 ### 2. CLI Layer
@@ -228,10 +231,11 @@ The CLI (`forgekit`) manages installation and development workflow.
 │  ┌─────────────────────────────────────────────────────┐ │
 │  │               MCP Protocol Layer                     │ │
 │  │                                                     │ │
-│  │  Prompts:  incident_report, investigate, rca_bugfix │ │
-│  │            analyze_{health,risk,patterns,component,  │ │
-│  │            architecture}, design_{tradeoff,validate, │ │
-│  │            migrate,impact,pattern}, research,        │ │
+│  │  Prompts:  incident_report, investigate, rca_bugfix, │ │
+│  │            blueprint, analyze_{health,risk,patterns, │ │
+│  │            component,architecture},                  │ │
+│  │            design_{tradeoff,validate,migrate,impact, │ │
+│  │            pattern}, research,                       │ │
 │  │            session_{start,end}, verify_session       │ │
 │  │                                                     │ │
 │  │  Tools:    watchdog_start, watchdog_status,          │ │

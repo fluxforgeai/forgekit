@@ -36,7 +36,7 @@ ForgeKit is an AI engineering skills toolkit distributed as an MCP server for cl
 
 ### Deliverables
 - Private git repo at `~/Projects/fluxforgeai/forgekit/`
-- 7 skills + 3 commands genericized and portable
+- 7 skills + 3 commands genericized and portable (8 skills after `/blueprint` added 2026-01-27)
 - CLI tool installed and working
 - Symlinks verified in pilot_connector project
 
@@ -54,7 +54,7 @@ ForgeKit is an AI engineering skills toolkit distributed as an MCP server for cl
 | 2.1 | Design skill-to-MCP mapping (Prompts, Tools, Resources) | Phase 1 |
 | 2.2 | Set up MCP server project (`server/` directory, FastAPI + MCP SDK) | Phase 1 |
 | 2.3 | Implement skill registry (load markdown files, parse frontmatter, cache) | 2.2 |
-| 2.4 | Implement MCP Prompts handlers (all 7 skills + modes as named prompts) | 2.3 |
+| 2.4 | Implement MCP Prompts handlers (all 8 skills + modes as named prompts) | 2.3 |
 | 2.5 | Implement MCP Tools handlers (watchdog start/stop/status) | 2.3 |
 | 2.6 | Implement MCP Resources handlers (conventions, templates) | 2.3 |
 | 2.7 | Implement authentication layer (API keys, tier checking) | 2.2 |
@@ -135,7 +135,8 @@ These improvements apply across all phases:
 
 | Item | Description | Priority |
 |------|-------------|----------|
-| Standardize handoff protocol | All 7 skills use consistent end format | High |
+| `/blueprint` skill | Design-to-spec bridge for proactive pipeline (DONE — 2026-01-27) | DONE |
+| Standardize handoff protocol | All 8 skills use consistent end format | High |
 | Add context-awareness | analyze/design check context budget before starting | High |
 | Watchdog-incident bridge | /incident can parse watchdog JSON files | Medium |
 | Research integration | investigate/rca-bugfix check existing research first | Medium |
