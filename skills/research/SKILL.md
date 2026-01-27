@@ -15,7 +15,7 @@
 
 ## Instructions
 
-1. **Identify the technoloies/topics** involved in the question
+1. **Identify the technologies/topics** involved in the question
 2. **Research official documentation** (search as of {current_month_year})
 3. **Research online** for community knowledge, Stack Overflow, GitHub issues (search as of {current_month_year})
 4. **Check existing research** in `docs/research/` and `docs/RCAs/` to avoid duplicating work
