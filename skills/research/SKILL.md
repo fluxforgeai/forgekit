@@ -5,6 +5,7 @@
 **Purpose**: Research topics thoroughly, document findings with sources, and build a knowledge base to avoid repeating the same issues.
 
 **Examples**:
+
 - `/research Why does Iterable batch export return 400 after job expires?`
 - `/research What are httpx timeout best practices for long-running downloads?`
 - `/research How does GCS resumable upload handle network interruptions?`
@@ -14,7 +15,7 @@
 
 ## Instructions
 
-1. **Identify the technology/topic** involved in the question
+1. **Identify the technoloies/topics** involved in the question
 2. **Research official documentation** (search as of {current_month_year})
 3. **Research online** for community knowledge, Stack Overflow, GitHub issues (search as of {current_month_year})
 4. **Check existing research** in `docs/research/` and `docs/RCAs/` to avoid duplicating work
@@ -28,15 +29,18 @@
 ### Step 1: Identify What to Research
 
 Parse the user's question or pasted text to identify:
-- What technology/API/library is involved?
-- What specific behavior or error needs explanation?
+
+- Which technologies/API/library are involved?
+- What specific behavior, enhancement or error needs explanation?
 - What is the user trying to understand?
+- What is the user trying to implement?
 
 ### Step 2: Search Official Documentation
 
 **Search as of {current_month_year}** for the relevant technology:
 
 **EXAMPLES** (use as patterns, search for whatever is relevant):
+
 - If about **Iterable**: Search "Iterable API {topic} {current_month_year}"
 - If about **Intercom**: Search "Intercom API {topic} {current_month_year}"
 - If about **GCS**: Search "Google Cloud Storage {topic} {current_month_year}"
@@ -50,6 +54,7 @@ Parse the user's question or pasted text to identify:
 ### Step 3: Search Online Resources
 
 Search for:
+
 - Stack Overflow questions/answers
 - GitHub issues and discussions
 - Blog posts from reputable sources
@@ -58,6 +63,7 @@ Search for:
 ### Step 4: Check Existing Knowledge
 
 Before writing, check:
+
 - `docs/research/` - Have we researched this before?
 - `docs/RCAs/` - Have we encountered this issue before?
 - `docs/investigations/` - Any related investigations?
@@ -68,6 +74,7 @@ If existing research exists, reference it and add new findings.
 ### Step 5: Synthesize Findings
 
 Combine all sources into a coherent answer:
+
 - What does the official documentation say?
 - What does the community say?
 - Are there any gotchas or undocumented behaviors?
