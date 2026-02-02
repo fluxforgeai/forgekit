@@ -35,6 +35,16 @@ Session is ending. Please complete all session end tasks:
 
    - Move old `NEXT_SESSION_PROMPT_*.md` to `docs/archive/sessions/`
    - Keep only the NEW handoff in root directory
+6. **Update Findings Tracker (if applicable):**
+
+   - Check if `docs/findings/*_FINDINGS_TRACKER.md` exists
+   - If it exists AND any findings-related work was done this session (fixes, investigations, designs, or verification of F1/F2/F3/F4 tasks):
+     - Update the checkbox status of any resolved tasks (e.g., `- [x] **F1.1**: ...`)
+     - Update the finding's `Status` field (`Open` → `In Progress` → `Resolved` → `Verified`)
+     - Update `Resolved in session` / `Verified in session` fields with the session number
+     - Add a row to the **Changelog** table with the date, session number, and what changed
+     - Update the `Last Updated` timestamp at the top of the file
+   - If no findings work was done this session, skip this step
 
 **IMPORTANT**:
 
@@ -50,3 +60,4 @@ After completing all tasks, provide a summary showing:
 - ✅ New summary filename
 - ✅ CLAUDE.md updated (show new line 24)
 - ✅ Old handoff archived location
+- ✅ Findings Tracker updated (if applicable — show which tasks/findings changed)
