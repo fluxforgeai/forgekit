@@ -41,22 +41,28 @@ echo ""
 echo "🌐 Recent global plan files (~/.claude/plans/):"
 find ~/.claude/plans -name "*.md" -mtime -7 -exec ls -lh {} \; 2>/dev/null || echo "   No recent global plans"
 
-# 8. Check Findings Tracker status
+# 8. Check Findings Tracker status (each related group of findings has its own named tracker)
 echo ""
-echo "🔎 Findings Tracker:"
-TRACKER=$(ls -t "$PROJECT_ROOT"/docs/findings/*_FINDINGS_TRACKER.md 2>/dev/null | head -1)
-if [ -n "$TRACKER" ]; then
-    echo "   File: $(basename "$TRACKER")"
-    echo "   Last Updated:"
-    grep "Last Updated" "$TRACKER" 2>/dev/null | head -1 | awk '{print "      " $0}'
-    echo "   Finding statuses:"
-    grep -E "^\| F[0-9]" "$TRACKER" 2>/dev/null | awk '{print "      " $0}'
-    echo "   Open tasks remaining:"
-    grep -c "\- \[ \]" "$TRACKER" 2>/dev/null | awk '{print "      " $0 " unchecked tasks"}'
-    echo "   Resolved tasks:"
-    grep -c "\- \[x\]" "$TRACKER" 2>/dev/null | awk '{print "      " $0 " completed tasks"}'
+echo "🔎 Findings Trackers:"
+TRACKERS=$(ls -t "$PROJECT_ROOT"/docs/findings/*_FINDINGS_TRACKER.md 2>/dev/null)
+if [ -n "$TRACKERS" ]; then
+    echo "$TRACKERS" | while read TRACKER; do
+        echo ""
+        echo "   --- $(basename "$TRACKER") ---"
+        echo "   Last Updated:"
+        grep "Last Updated" "$TRACKER" 2>/dev/null | head -1 | awk '{print "      " $0}'
+        SCOPE=$(grep "^\\*\\*Scope\\*\\*:" "$TRACKER" 2>/dev/null | head -1)
+        if [ -n "$SCOPE" ]; then
+            echo "   $SCOPE"
+        fi
+        echo "   Finding statuses:"
+        grep -E "^\| F[0-9]" "$TRACKER" 2>/dev/null | awk '{print "      " $0}'
+        OPEN=$(grep -c "\- \[ \]" "$TRACKER" 2>/dev/null)
+        DONE=$(grep -c "\- \[x\]" "$TRACKER" 2>/dev/null)
+        echo "   Tasks: $DONE completed, $OPEN remaining"
+    done
 else
-    echo "   No Findings Tracker found (docs/findings/*_FINDINGS_TRACKER.md)"
+    echo "   No Findings Trackers found (docs/findings/*_FINDINGS_TRACKER.md)"
 fi
 
 # 9. Check key project documents were updated
@@ -82,7 +88,7 @@ grep "Last Updated" "$PROJECT_ROOT/CLAUDE.md" 2>/dev/null | head -1 | awk '{prin
 - Global plan files are copied to project (docs/plans/)
 - IMPLEMENTATION_PLAN.md "Last Updated" matches session date
 - CLAUDE.md "Last Updated" matches session date
-- Findings Tracker "Last Updated" matches session date (if findings work was done)
+- All relevant Findings Trackers have "Last Updated" matching session date (if findings work was done)
 - Findings Tracker task checkboxes reflect work completed this session
 
 ❌ **Problems if:**
@@ -93,7 +99,7 @@ grep "Last Updated" "$PROJECT_ROOT/CLAUDE.md" 2>/dev/null | head -1 | awk '{prin
 - Recent global plan files not copied to project
 - IMPLEMENTATION_PLAN.md not updated (stale "Last Updated")
 - Key project documents out of sync with handoff
-- Findings Tracker not updated after findings-related work (stale checkboxes or status)
+- Any Findings Tracker not updated after related work was done (stale checkboxes or status)
 - Findings Tracker changelog missing entry for current session
 
 **If problems found, suggest fixes:**
