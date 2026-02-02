@@ -157,7 +157,34 @@ This is a corrective fix candidate. Recommended next steps:
 2. /rca-bugfix stale detection state desynchronization
 ```
 
-You follow the recommended path. The Findings Tracker tracks your progress.
+**Step 4** — Investigate. You can invoke the next skill two ways:
+
+```
+# Option A: Pass the artifact path (explicit — the skill reads it directly)
+/investigate docs/findings/2026-02-10_0800_state_desynchronization.md
+
+# Option B: Reference the finding number (tracker-aware — the skill looks up F1 in the tracker)
+/investigate F1
+```
+
+Both work. Option A is explicit: the skill reads the file you point it to. Option B uses the lifecycle tracking protocol: the skill searches `docs/findings/*_FINDINGS_TRACKER.md` for F1, finds the linked finding report and any prior artifacts, and uses all of them as context.
+
+The investigation produces a report in `docs/investigations/`. The tracker is automatically updated: F1 Stage → `Investigating`.
+
+**Step 5** — Fix it. Same pattern — pass the investigation report or reference the finding:
+
+```
+# Option A: Pass the investigation report
+/rca-bugfix docs/investigations/2026-02-10_0830_state_desynchronization.md
+
+# Option B: Reference the finding (skill finds the tracker, finding report, AND investigation)
+/rca-bugfix F1
+```
+
+The RCA skill reads upstream artifacts in order: investigations first, then findings. When you pass `F1`, it resolves the full chain — tracker → finding report → investigation — and uses all of them as context for the root cause analysis.
+
+**Step 6** — Plan and implement:
+Enter `/plan` mode with the generated prompt. The tracker is updated at each step: `RCA Complete` → `Planned` → `Resolved` → `Verified`.
 
 ### Scenario 4: Multiple findings from a single analysis
 
@@ -182,7 +209,7 @@ The tracker lists all four findings sorted by severity, with auto-generated reso
 | F4 | Serial queue blocking     | Gap    | **Medium**   | Open   | Open  |
 ```
 
-Over the next few sessions, you work through the findings. Every downstream skill automatically updates the tracker as it processes a finding — you just follow the recommended next steps:
+Over the next few sessions, you work through the findings. Every downstream skill automatically updates the tracker as it processes a finding. You invoke each skill with the F-number — the skill resolves the full artifact chain (tracker → finding report → investigation → RCA) from that single identifier:
 
 ```
 Session 1: /finding discovers F1, F2, F3, F4 → tracker created (all Stage: Open)
