@@ -98,6 +98,7 @@ The autonomous AI agent market is projected to reach $8.5B by 2026 (Deloitte). M
 | SK-014 | `/design pattern` | Explain and assess applicability of a design pattern | P2 |
 | SK-015 | `/research` | Topic research with documented findings and sources | P0 |
 | SK-019 | `/blueprint` | Transform design/research output into implementation spec + prompt for `/plan` | P0 |
+| SK-020 | `/finding` | Log proactive discoveries with type classification (Defect/Vulnerability/Debt/Gap/Drift) and severity assessment. Entry point for audit pipeline. | P0 |
 
 #### 4.1.3 Session Management
 
@@ -116,6 +117,8 @@ The autonomous AI agent market is projected to reach $8.5B by 2026 (Deloitte). M
 | INT-003 | Design escalation: `/analyze` findings trigger `/design` suggestion | P1 |
 | INT-004 | Watchdog-to-incident bridge: `/incident` can parse watchdog JSON | P2 |
 | INT-005 | Research integration: `/investigate` and `/rca-bugfix` check `docs/research/` | P2 |
+| INT-006 | Fix escalation: `/analyze` findings trigger `/finding` suggestion for corrective action | P1 |
+| INT-007 | Finding artifacts (`docs/findings/`) read by `/investigate`, `/analyze`, `/rca-bugfix`, `/research` | P1 |
 
 ### 4.3 Distribution
 
@@ -192,7 +195,7 @@ The autonomous AI agent market is projected to reach $8.5B by 2026 (Deloitte). M
 
 ### Key Differentiators
 
-1. **Dual pipelines**: Reactive (watchdog -> incident -> investigate -> rca-bugfix -> plan) and Proactive (research -> design -> blueprint -> plan) converge at `/plan`
+1. **Triple pipelines**: Reactive (watchdog -> incident -> investigate -> rca-bugfix -> plan), Proactive (research -> design -> blueprint -> plan), and Audit (analyze -> finding -> investigate/design -> rca-bugfix/blueprint -> plan) converge at `/plan`
 2. **Interactive methodology**: Checkpoints adapt to user context (not one-shot templates)
 3. **Design escalation**: Analysis findings automatically suggest architectural exploration
 4. **Institutional memory**: Shared artifacts accumulate knowledge across sessions

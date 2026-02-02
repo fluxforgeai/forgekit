@@ -135,9 +135,13 @@ These improvements apply across all phases:
 
 | Item | Description | Priority |
 |------|-------------|----------|
-| `/blueprint` skill | Design-to-spec bridge for proactive pipeline (DONE — 2026-01-27) | DONE |
-| Standardize handoff protocol | All 8 skills use consistent end format | High |
+| `/blueprint` skill | Design-to-spec bridge for proactive pipeline (DONE -- 2026-01-27) | DONE |
+| `/finding` skill | Audit pipeline entry point for proactive discoveries (Defect/Vulnerability/Debt/Gap/Drift classification) | High |
+| Fix escalation in `/analyze` | Add "Corrective fix" option alongside Design Escalation in all analyze modes | High |
+| `/investigate` confirmation mode | Accept finding reports as input with abbreviated investigation for known causes | High |
+| Standardize handoff protocol | All 9 skills use consistent end format | High |
 | Add context-awareness | analyze/design check context budget before starting | High |
+| Finding artifact integration | `/investigate`, `/analyze`, `/rca-bugfix`, `/research` read `docs/findings/` | Medium |
 | Watchdog-incident bridge | /incident can parse watchdog JSON files | Medium |
 | Research integration | investigate/rca-bugfix check existing research first | Medium |
 | Add --quick flag | All skills support abbreviated execution | Medium |

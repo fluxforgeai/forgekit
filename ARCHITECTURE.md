@@ -49,18 +49,19 @@ fluxforgeai/forgekit/
 ├── pyproject.toml                      # Python package definition
 ├── .gitignore
 │
-├── skills/                             # The 8 operational skills
-│   ├── blueprint/SKILL.md            #   Design-to-spec for proactive pipeline
-│   ├── incident/SKILL.md              #   Incident documentation
-│   ├── investigate/SKILL.md           #   Deep investigation
-│   ├── rca-bugfix/SKILL.md            #   Root cause analysis + fix prompts
-│   ├── watchdog/SKILL.md              #   Autonomous log monitoring
+├── skills/                             # The 9 operational skills
 │   ├── analyze/                       #   Systems analysis (5 modes)
 │   │   ├── SKILL.md
 │   │   ├── DESIGN_ESCALATION.md       #   Analyze → Design bridge spec
 │   │   └── DESIGN_SKILL_SPEC.md       #   Design skill full specification
+│   ├── blueprint/SKILL.md            #   Design-to-spec for proactive pipeline
 │   ├── design/SKILL.md               #   Architectural design (5 modes)
-│   └── research/SKILL.md             #   Topic research
+│   ├── finding/SKILL.md              #   Proactive discovery logging (audit pipeline)
+│   ├── incident/SKILL.md              #   Incident documentation
+│   ├── investigate/SKILL.md           #   Deep investigation
+│   ├── rca-bugfix/SKILL.md            #   Root cause analysis + fix prompts
+│   ├── research/SKILL.md             #   Topic research
+│   └── watchdog/SKILL.md              #   Autonomous log monitoring
 │
 ├── commands/                           # Session management commands
 │   ├── session-start.md               #   Initialize session with context
@@ -112,9 +113,17 @@ Skills are markdown files with optional YAML frontmatter. Each skill defines a m
 │                                                              ▲    │
 │  Proactive Pipeline:                                         │    │
 │  /research ──► /design ──► /blueprint ──────────────────────┘    │
-│                              (spec + prompt)                      │
-│                                                                   │
-│  Strategic: /analyze ──► feeds into either pipeline               │
+│                              (spec + prompt)                 ▲    │
+│                                                              │    │
+│  Audit Pipeline:                                             │    │
+│  /analyze ──► /finding ──► /investigate ──► /rca-bugfix ────┘    │
+│                  │          (confirm)       (fix prompt)           │
+│                  │                                                │
+│                  ├──► /design ──► /blueprint ─────────────────┘   │
+│                  │    (if Design Escalation)                      │
+│                  │                                                │
+│                  └──► /rca-bugfix (if cause known,               │
+│                       skip investigate)                           │
 │                                                                   │
 │  Session Management:                                              │
 │  /session-start ──► (work) ──► /session-end                       │
@@ -142,12 +151,14 @@ description: "When this skill should be used"
 
 | Artifact Path | Written By | Read By |
 |--------------|-----------|---------|
-| `docs/blueprints/*.md` | blueprint | plan mode |
-| `docs/RCAs/*.md` | rca-bugfix | investigate, analyze |
+| `docs/findings/*.md` | finding | investigate, analyze, rca-bugfix, research |
 | `docs/incidents/*.md` | incident | investigate, analyze |
-| `docs/analysis/*.md` | analyze | design |
-| `docs/design/*.md` | design | blueprint, (implementation) |
+| `docs/investigations/*.md` | investigate | rca-bugfix, analyze |
+| `docs/RCAs/*.md` | rca-bugfix | investigate, analyze |
 | `docs/research/*.md` | research | investigate, design, blueprint |
+| `docs/analysis/*.md` | analyze | design, investigate, finding |
+| `docs/design/*.md` | design | blueprint, (implementation) |
+| `docs/blueprints/*.md` | blueprint | plan mode |
 | `docs/prompts/*.md` | rca-bugfix, blueprint | plan mode |
 | `system-map.md` | analyze | analyze (refreshed each run) |
 

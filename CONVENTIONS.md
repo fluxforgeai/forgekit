@@ -9,6 +9,7 @@ your-project/
 ├── CLAUDE.md                      # Project context (auto-loaded by Claude Code)
 ├── docs/
 │   ├── incidents/                 # /incident writes here
+│   ├── findings/                  # /finding writes here (proactive discoveries)
 │   ├── investigations/            # /investigate writes here
 │   ├── blueprints/                # /blueprint writes implementation specs here
 │   ├── RCAs/                      # /rca-bugfix writes RCA reports here
@@ -39,15 +40,17 @@ Examples:
 
 ## Shared Artifacts
 
-Skills communicate through shared documents:
+Skills communicate through shared documents. Each artifact is written by one skill and read by downstream skills, creating a feedback loop (institutional memory).
 
 | Artifact | Written By | Read By |
 |----------|-----------|---------|
-| `docs/blueprints/*.md` | blueprint | plan mode |
-| `docs/RCAs/*.md` | rca-bugfix | investigate, analyze |
+| `docs/findings/*.md` | finding | investigate, analyze, rca-bugfix, research |
 | `docs/incidents/*.md` | incident | investigate, analyze |
-| `docs/analysis/*.md` | analyze | design, investigate |
-| `docs/design/*.md` | design | blueprint, (implementation) |
+| `docs/investigations/*.md` | investigate | rca-bugfix, analyze |
+| `docs/RCAs/*.md` | rca-bugfix | investigate, analyze |
 | `docs/research/*.md` | research | investigate, design, blueprint |
-| `system-map.md` | analyze | analyze (refreshed each run) |
+| `docs/analysis/*.md` | analyze | design, investigate, finding |
+| `docs/design/*.md` | design | blueprint, (implementation) |
+| `docs/blueprints/*.md` | blueprint | plan mode |
 | `docs/prompts/*.md` | rca-bugfix, blueprint | plan mode |
+| `system-map.md` | analyze | analyze (refreshed each run) |
