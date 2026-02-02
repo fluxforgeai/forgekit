@@ -67,6 +67,7 @@ Before writing, check:
 - `docs/research/` - Have we researched this before?
 - `docs/RCAs/` - Have we encountered this issue before?
 - `docs/investigations/` - Any related investigations?
+- `docs/findings/` - Any proactive findings related to this topic?
 - `docs/plans/` - Any implementation plans that addressed this?
 
 If existing research exists, reference it and add new findings.

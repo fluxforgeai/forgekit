@@ -25,7 +25,7 @@
 2. **Fully Interactive**: ALL modes use AskUserQuestion at key decision points.
 3. **Artifact-Driven**: System Map persists across analyses.
 4. **No File Edits Without Confirmation**: Architecture mode previews changes before applying.
-5. **Design Escalation**: When findings suggest redesign, offer to explore alternatives.
+5. **Escalation**: When findings suggest redesign or corrective fix, offer to explore alternatives.
 
 ---
 
@@ -211,6 +211,7 @@ Write to: `docs/analysis/system-map.md`
    - Read all `docs/RCAs/*.md`
    - Read all `docs/incidents/*.md`
    - Read all `docs/investigations/*.md`
+   - Read all `docs/findings/*.md`
    - Search logs for error patterns (last 7 days)
 
 5. **Analyze**:
@@ -248,9 +249,9 @@ Write to: `docs/analysis/system-map.md`
    - Let me provide context
    ```
 
-8. **Design Escalation Check**:
-   If any finding suggests redesign opportunity → trigger escalation checkpoint
-   (See DESIGN_ESCALATION.md)
+8. **Escalation Check**:
+   If any finding suggests redesign or corrective fix → trigger escalation checkpoint
+   (See Escalation section below)
 
 9. **Generate Report**: Write to `docs/analysis/{YYYY-MM-DD_HHMM}_health.md`
 
@@ -319,9 +320,9 @@ Write to: `docs/analysis/system-map.md`
    - False positive - explain why
    ```
 
-6. **Design Escalation Check**:
-   If any pattern suggests redesign opportunity → trigger escalation checkpoint
-   (See DESIGN_ESCALATION.md)
+6. **Escalation Check**:
+   If any pattern suggests redesign or corrective fix → trigger escalation checkpoint
+   (See Escalation section below)
 
 7. **Generate Report**: Write to `docs/analysis/{YYYY-MM-DD_HHMM}_patterns.md`
 
@@ -385,13 +386,13 @@ Write to: `docs/analysis/system-map.md`
 5. **Analyze Component**:
    - Read all source files
    - Map dependencies (what it imports, what imports it)
-   - Find related incidents/RCAs
+   - Find related incidents/RCAs/findings
    - Identify error handling patterns
    - Assess test coverage (if requested)
 
-6. **Design Escalation Check**:
-   If findings suggest redesign opportunity → trigger escalation checkpoint
-   (See DESIGN_ESCALATION.md)
+6. **Escalation Check**:
+   If findings suggest redesign or corrective fix → trigger escalation checkpoint
+   (See Escalation section below)
 
 7. **Generate Report**: Write to `docs/analysis/{YYYY-MM-DD_HHMM}_component_{name}.md`
 
@@ -479,9 +480,9 @@ Write to: `docs/analysis/system-map.md`
    - Not a real risk (explain)
    ```
 
-7. **Design Escalation Check**:
-   If any risk suggests redesign opportunity → trigger escalation checkpoint
-   (See DESIGN_ESCALATION.md)
+7. **Escalation Check**:
+   If any risk suggests redesign or corrective fix → trigger escalation checkpoint
+   (See Escalation section below)
 
 8. **Generate Report**: Write to `docs/analysis/{YYYY-MM-DD_HHMM}_risk.md`
 
@@ -563,9 +564,9 @@ Write to: `docs/analysis/system-map.md`
    - No, cancel (just output the report)
    ```
 
-7. **Design Escalation Check**:
-   If architectural issues suggest redesign → trigger escalation checkpoint
-   (See DESIGN_ESCALATION.md)
+7. **Escalation Check**:
+   If architectural issues suggest redesign or corrective fix → trigger escalation checkpoint
+   (See Escalation section below)
 
 8. **Generate Report**: Write to `docs/analysis/{YYYY-MM-DD_HHMM}_architecture.md`
 
@@ -575,33 +576,41 @@ Write to: `docs/analysis/system-map.md`
 
 ---
 
-## Design Escalation
+## Escalation
 
-When any mode detects a finding that suggests **architectural redesign** rather than a point fix, trigger an escalation checkpoint.
+When any mode detects a finding that suggests **architectural redesign** or a **corrective fix**, trigger an escalation checkpoint.
 
-### Escalation Triggers
+### Design Triggers
 - Same logic duplicated in 3+ files
 - Technology choice conflicts with requirements
 - Approach won't scale to 10x
 - Same component in 3+ incidents
 - High coupling hotspot
 
+### Fix Triggers
+- Known bug found by analysis
+- Security vulnerability with known exposure
+- Configuration drift from intended state
+- Deprecated dependency with known CVE or EOL
+- Missing validation at a trust boundary
+
 ### Escalation Checkpoint
 ```
 Use AskUserQuestion:
 "Finding: {description}
 
-This suggests a design consideration rather than a point fix.
-Would you like to explore design alternatives?"
+This suggests a design consideration or corrective fix.
+How would you like to proceed?"
 
 Options:
-- Yes, explore inline (quick trade-off analysis)
-- Yes, deep dive (recommend /design skill)
-- No, just note it in the report
-- No, this is a known accepted limitation
+- Explore design inline (quick trade-off analysis)
+- Design deep dive (recommend /design skill)
+- Corrective fix (recommend /finding then /rca-bugfix)
+- Note it in the report
+- Accepted limitation (no action needed)
 ```
 
-See `DESIGN_ESCALATION.md` for full specification.
+See `DESIGN_ESCALATION.md` for full design escalation specification.
 
 ---
 
@@ -651,6 +660,11 @@ See `DESIGN_ESCALATION.md` for full specification.
 
 ## Design Considerations
 {Any findings that triggered design escalation, with user's decision}
+
+---
+
+## Fix Escalations
+{Any findings that triggered fix escalation, with user's decision}
 
 ---
 
@@ -709,7 +723,8 @@ Health Score: {X}/10 (if health mode)
 Risks Found: {N} critical, {N} high (if risk mode)
 Patterns Found: {N} recurring issues (if patterns mode)
 
-Design Considerations: {N} escalation opportunities identified
+Design Considerations: {N} design escalation opportunities identified
+Fix Escalations: {N} corrective fix opportunities identified
 
 Recommended next steps:
 - {Specific recommendation based on findings}
@@ -728,6 +743,7 @@ Awaiting your instructions.
 | Found specific incident pattern | `/investigate {pattern}` |
 | Identified root cause | `/rca-bugfix {cause}` |
 | Design escalation selected "deep dive" | `/design tradeoff {topic}` |
+| Fix escalation selected "corrective fix" | `/finding {description}` |
 | Need implementation plan | Use EnterPlanMode |
 | Need ongoing monitoring | `/watchdog {component}` |
 

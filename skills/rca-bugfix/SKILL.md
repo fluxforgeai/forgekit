@@ -15,6 +15,18 @@ The user has provided an issue to investigate. THINK MAX HARD about this issue.
 
 ---
 
+## Input Sources
+
+Before starting the RCA, check for upstream artifacts that provide context:
+
+1. **`docs/investigations/*.md`** (from `/investigate`) -- If an investigation exists for this issue, read it first. It contains root cause analysis, evidence, and recommended fixes.
+2. **`docs/findings/*.md`** (from `/finding`) -- If a proactive finding exists for this issue (and investigation was skipped), read it first. It contains classification, evidence, and preliminary assessment.
+3. **User-provided description** (direct invocation) -- If no upstream artifacts exist, work from the description provided after `/rca-bugfix`.
+
+**Note**: When a finding report exists with a known cause, the Root Cause section of the RCA may be shorter since the cause is already documented. Focus the RCA on confirming the cause, defining the fix, and writing the implementation prompt.
+
+---
+
 ## CRITICAL: File Naming Convention
 
 **ALL files MUST use this exact format**: `{YYYY-MM-DD_HHMM}_{issue_name}.md`
