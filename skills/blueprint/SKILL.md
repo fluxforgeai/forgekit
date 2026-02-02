@@ -72,6 +72,48 @@ Based on the context usage:
 
 ---
 
+## Findings Tracker Update Protocol
+
+At the START of blueprinting, check if this work relates to a tracked finding:
+
+1. If input contains `F{N}` (e.g., "F1", "F3"), search `docs/findings/*_FINDINGS_TRACKER.md` for that finding
+2. If input is topic-based, search active trackers for a matching finding title
+3. If a match is found:
+   a. Read the tracker, finding report, and any linked design analysis
+   b. Use these as context for the blueprint
+
+At the END of blueprinting (after writing the blueprint + implementation prompt):
+
+1. Update the tracker's overview table: set `Stage` to `Blueprint Ready`, set `Status` to `In Progress`
+2. Update the per-finding **Lifecycle** table — append row:
+   ```
+   | Blueprint Ready | {YYYY-MM-DD HH:MM} UTC | {session} | [Blueprint]({blueprint_path}) + [Prompt]({prompt_path}) |
+   ```
+3. Check the resolution task: `[x] **FN.2**: Blueprint + implementation prompt...`
+4. Add changelog entry:
+   ```
+   | {YYYY-MM-DD HH:MM} UTC | {session} | FN stage → Blueprint Ready. Blueprint: {blueprint_path}, Prompt: {prompt_path} |
+   ```
+5. Update `Last Updated` timestamp at top of tracker
+
+**HANDOFF UPDATE** — After the standard handoff message to the user, add:
+
+```
+Tracker updated: {tracker_path} — FN stage → Blueprint Ready
+
+After /plan completes, update the tracker:
+- Stage → Planned
+- Lifecycle row: `| Planned | {timestamp} | {session} | [Plan]({plan_path}) |`
+- Check task: `[x] **FN.3**: Implementation plan...`
+- Changelog: `FN stage → Planned. Plan: {plan_path}`
+```
+
+This ensures the tracker gets updated after /plan (which is EnterPlanMode and can't be modified directly).
+
+If no matching finding exists, proceed normally — not all blueprints originate from findings.
+
+---
+
 ## Blueprint Analysis Process
 
 When creating the blueprint, follow this process:

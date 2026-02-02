@@ -153,18 +153,22 @@ The overview table is **always sorted by severity** (most critical first): Criti
 
 Auto-generate resolution tasks based on the finding's classification:
 
-**Defect or Vulnerability:**
+**Defect or Vulnerability** (Corrective Route):
 ```
-- [ ] **FN.1**: Confirm root cause and scope
-- [ ] **FN.2**: Implement corrective fix
-- [ ] **FN.3**: Verify fix with test or production validation
+- [ ] **FN.1**: Investigate — confirm root cause and scope (→ /investigate → Stage: Investigating)
+- [ ] **FN.2**: RCA + fix design (→ /rca-bugfix → Stage: RCA Complete)
+- [ ] **FN.3**: Implementation plan (→ /plan → Stage: Planned)
+- [ ] **FN.4**: Implement fix (Stage: Implementing → Resolved)
+- [ ] **FN.5**: Verify fix in production/test (Stage: Verified)
 ```
 
-**Debt, Gap, or Drift:**
+**Debt, Gap, or Drift** (Design Route):
 ```
-- [ ] **FN.1**: Design approach (evaluate options)
-- [ ] **FN.2**: Implement chosen approach
-- [ ] **FN.3**: Verify implementation
+- [ ] **FN.1**: Design approach (→ /design → Stage: Designing)
+- [ ] **FN.2**: Blueprint + implementation prompt (→ /blueprint → Stage: Blueprint Ready)
+- [ ] **FN.3**: Implementation plan (→ /plan → Stage: Planned)
+- [ ] **FN.4**: Implement changes (Stage: Implementing → Resolved)
+- [ ] **FN.5**: Verify implementation (Stage: Verified)
 ```
 
 The recommended downstream skill for each task should be included inline:
@@ -195,11 +199,12 @@ Write to: `docs/findings/{YYYY-MM-DD_HHMM}_{findings_name}_FINDINGS_TRACKER.md`
 
 {One sentence describing the scope of tracked findings.}
 
-| # | Finding | Type | Severity | Status | Report |
-|---|---------|------|----------|--------|--------|
-| F1 | {Brief title} | {Type} | **{Severity}** | Open | [Report]({relative_path_to_finding_report}) |
+| # | Finding | Type | Severity | Status | Stage | Report |
+|---|---------|------|----------|--------|-------|--------|
+| F1 | {Brief title} | {Type} | **{Severity}** | Open | Open | [Report]({relative_path_to_finding_report}) |
 
 **Status legend**: `Open` → `In Progress` → `Resolved` → `Verified`
+**Stage legend**: `Open` → `Investigating` / `Designing` → `RCA Complete` / `Blueprint Ready` → `Planned` → `Implementing` → `Resolved` → `Verified`
 
 ---
 
@@ -224,9 +229,15 @@ No dependencies mapped yet. Update as relationships between findings are identif
 **Recommended approach**: {Downstream skill from Classification Taxonomy — e.g., `/rca-bugfix` or `/design tradeoff`}
 
 **Status**: Open
+**Stage**: Open
 **Resolved in session**: —
 **Verified in session**: —
 **Notes**: —
+
+**Lifecycle**:
+| Stage | Timestamp | Session | Artifact |
+|-------|-----------|---------|----------|
+| Open | {YYYY-MM-DD HH:MM} UTC | {N} | [Finding Report]({relative_path_to_finding_report}) |
 
 ---
 
@@ -264,6 +275,69 @@ When a single `/finding` invocation produces multiple findings (e.g., from a com
 - Add ALL findings to the tracker in one pass
 - Sort the overview table by severity after all are added
 - Changelog gets ONE entry: `Created tracker. F1-FN logged from {source}.` (for creation) or `FN-FM added from {source}.` (for update)
+
+---
+
+## Lifecycle Tracking Protocol
+
+Every downstream skill that processes a finding MUST update the Findings Tracker. This ensures the tracker reflects the true state of each finding at all times.
+
+### How It Works
+
+- Each finding has a **Status** (coarse: Open → In Progress → Resolved → Verified) and a **Stage** (fine-grained pipeline position)
+- When a downstream skill processes a finding, it updates: Stage column, lifecycle table row, resolution task checkbox, and changelog entry
+- The F-number (`F1`, `F2`, etc.) is the stable identifier used across all skills. Downstream skills accept `F{N}` as input to identify the finding
+
+### Stage Progression
+
+**Corrective Route** (Defect / Vulnerability):
+```
+Open → Investigating → RCA Complete → Planned → Implementing → Resolved → Verified
+         /investigate    /rca-bugfix    /plan      (code work)   session-end  session-end
+```
+
+**Design Route** (Debt / Gap / Drift):
+```
+Open → Designing → Blueprint Ready → Planned → Implementing → Resolved → Verified
+        /design      /blueprint       /plan      (code work)   session-end  session-end
+```
+
+### Stage ↔ Status Mapping
+
+| Stage | Status |
+|-------|--------|
+| Open | Open |
+| Investigating / Designing | In Progress |
+| RCA Complete / Blueprint Ready | In Progress |
+| Planned | In Progress |
+| Implementing | In Progress |
+| Resolved | Resolved |
+| Verified | Verified |
+
+Status is the coarse view (4 states) — preserved for backward compatibility.
+Stage is the fine-grained view (7 states) — tracks pipeline position.
+
+### What Each Downstream Skill Updates
+
+| Skill | Sets Stage To | Checks Task | Lifecycle Row Artifact |
+|-------|--------------|-------------|----------------------|
+| `/investigate` | Investigating | FN.1 | Investigation report |
+| `/rca-bugfix` | RCA Complete | FN.2 | RCA + Prompt |
+| `/design` | Designing | FN.1 (design route) | Design analysis |
+| `/blueprint` | Blueprint Ready | FN.2 (design route) | Blueprint + Prompt |
+| `/plan` (via handoff) | Planned | FN.3 | Plan |
+| code implementation | Implementing → Resolved | FN.4 | Commit/PR |
+| verification | Verified | FN.5 | Test/validation |
+
+### Update Checklist (for downstream skills)
+
+When a downstream skill processes a tracked finding, it MUST:
+1. Update the overview table: set `Stage` column to the new stage
+2. Update the overview table: set `Status` column per the Stage ↔ Status mapping
+3. Append a row to the per-finding **Lifecycle** table
+4. Check the corresponding resolution task checkbox (`[x]`)
+5. Add a changelog entry: `| {date} | {session} | FN stage → {Stage}. {Artifact}: {path} |`
+6. Update `Last Updated` timestamp at top of tracker
 
 ---
 

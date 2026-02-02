@@ -41,7 +41,7 @@ echo ""
 echo "🌐 Recent global plan files (~/.claude/plans/):"
 find ~/.claude/plans -name "*.md" -mtime -7 -exec ls -lh {} \; 2>/dev/null || echo "   No recent global plans"
 
-# 8. Check Findings Tracker status (each related group of findings has its own named tracker)
+# 8. Check Findings Tracker status with lifecycle verification
 echo ""
 echo "🔎 Findings Trackers:"
 TRACKERS=$(ls -t "$PROJECT_ROOT"/docs/findings/*_FINDINGS_TRACKER.md 2>/dev/null)
@@ -55,12 +55,27 @@ if [ -n "$TRACKERS" ]; then
         if [ -n "$SCOPE" ]; then
             echo "   $SCOPE"
         fi
-        echo "   Finding statuses:"
+        echo "   Finding statuses (with Stage):"
         grep -E "^\| F[0-9]" "$TRACKER" 2>/dev/null | awk '{print "      " $0}'
         OPEN=$(grep -c "\- \[ \]" "$TRACKER" 2>/dev/null)
         DONE=$(grep -c "\- \[x\]" "$TRACKER" 2>/dev/null)
-        echo "   Tasks: $DONE completed, $OPEN remaining"
+        TOTAL=$((OPEN + DONE))
+        echo "   Tasks: $DONE completed, $OPEN remaining (of $TOTAL total)"
+        echo "   Lifecycle progress:"
+        # Extract F-numbers and their stages
+        grep -E "^\*\*Stage\*\*:" "$TRACKER" 2>/dev/null | while read STAGE_LINE; do
+            echo "      $STAGE_LINE"
+        done
     done
+    # Stage consistency checks
+    echo ""
+    echo "   Stage consistency checks:"
+    echo "   (Verify: investigation report exists → Stage ≥ Investigating)"
+    echo "   (Verify: RCA exists → Stage ≥ RCA Complete)"
+    echo "   (Verify: design exists → Stage ≥ Designing)"
+    echo "   (Verify: blueprint exists → Stage ≥ Blueprint Ready)"
+    echo "   (Verify: plan exists → Stage ≥ Planned)"
+    echo "   (Run manually: cross-reference docs/investigations/, docs/RCAs/, docs/design/, docs/blueprints/, docs/plans/ against tracker stages)"
 else
     echo "   No Findings Trackers found (docs/findings/*_FINDINGS_TRACKER.md)"
 fi
@@ -90,6 +105,8 @@ grep "Last Updated" "$PROJECT_ROOT/CLAUDE.md" 2>/dev/null | head -1 | awk '{prin
 - CLAUDE.md "Last Updated" matches session date
 - All relevant Findings Trackers have "Last Updated" matching session date (if findings work was done)
 - Findings Tracker task checkboxes reflect work completed this session
+- Findings Tracker Stage column is consistent with existing artifacts (e.g., if investigation report exists, Stage should be ≥ Investigating)
+- Lifecycle tables have rows for each completed stage transition
 
 ❌ **Problems if:**
 - CLAUDE.md imports a file that doesn't exist
@@ -101,6 +118,8 @@ grep "Last Updated" "$PROJECT_ROOT/CLAUDE.md" 2>/dev/null | head -1 | awk '{prin
 - Key project documents out of sync with handoff
 - Any Findings Tracker not updated after related work was done (stale checkboxes or status)
 - Findings Tracker changelog missing entry for current session
+- Findings Tracker Stage inconsistent with artifacts (e.g., investigation exists but Stage still `Open`)
+- Lifecycle table missing rows for completed stage transitions
 
 **If problems found, suggest fixes:**
 - Update CLAUDE.md line 24 to point to correct file
@@ -109,4 +128,4 @@ grep "Last Updated" "$PROJECT_ROOT/CLAUDE.md" 2>/dev/null | head -1 | awk '{prin
 - Copy global plan files to docs/plans/ for persistence
 - Update IMPLEMENTATION_PLAN.md with current session status
 - Ensure all "Last Updated" timestamps match session date
-- Update Findings Tracker: check off completed tasks, update finding statuses, add changelog entry
+- Update Findings Tracker: check off completed tasks, update finding statuses and stages, backfill lifecycle rows, add changelog entry

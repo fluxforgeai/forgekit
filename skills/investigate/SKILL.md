@@ -149,6 +149,34 @@ Construct a precise timeline of events:
 
 ---
 
+## Findings Tracker Update Protocol
+
+At the START of investigation, check if this work relates to a tracked finding:
+
+1. If input contains `F{N}` (e.g., "F1", "F3"), search `docs/findings/*_FINDINGS_TRACKER.md` for that finding
+2. If input is topic-based, search active trackers for a matching finding title
+3. If a match is found:
+   a. Read the tracker and the linked finding report
+   b. Use the finding report as additional context for the investigation
+
+At the END of investigation (after writing the investigation report):
+
+1. Update the tracker's overview table: set `Stage` to `Investigating`, set `Status` to `In Progress`
+2. Update the per-finding **Lifecycle** table — append row:
+   ```
+   | Investigating | {YYYY-MM-DD HH:MM} UTC | {session} | [Investigation]({report_path}) |
+   ```
+3. Check the resolution task: `[x] **FN.1**: Investigate...`
+4. Add changelog entry:
+   ```
+   | {YYYY-MM-DD HH:MM} UTC | {session} | FN stage → Investigating. Investigation report: {report_path} |
+   ```
+5. Update `Last Updated` timestamp at top of tracker
+
+If no matching finding exists, proceed normally — not all investigations originate from findings.
+
+---
+
 ## Investigation Report Template
 
 Write the report to: `docs/investigations/{YYYY-MM-DD_HHMM}_{issue_name}.md`

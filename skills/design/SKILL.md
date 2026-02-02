@@ -790,6 +790,32 @@ All modes generate reports with this structure:
 
 ---
 
+## Findings Tracker Update Protocol
+
+If this design analysis relates to a tracked finding (user references `F{N}` or topic matches an active finding):
+
+At the START of design analysis:
+1. If input contains `F{N}`, search `docs/findings/*_FINDINGS_TRACKER.md` for that finding
+2. If input is topic-based, search active trackers for a matching finding title
+3. If a match is found, read the tracker and finding report for additional context
+
+At the END of design analysis (after writing the report):
+1. Update tracker overview table: set `Stage` to `Designing`, set `Status` to `In Progress`
+2. Append lifecycle row:
+   ```
+   | Designing | {YYYY-MM-DD HH:MM} UTC | {session} | [Design Analysis]({report_path}) |
+   ```
+3. Check applicable resolution task: `[x] **FN.1**: Design approach...` (for Debt/Gap/Drift findings)
+4. Add changelog entry:
+   ```
+   | {YYYY-MM-DD HH:MM} UTC | {session} | FN stage → Designing. Design analysis: {report_path} |
+   ```
+5. Update `Last Updated` timestamp at top of tracker
+
+If not working on a tracked finding, skip tracker updates.
+
+---
+
 ## After Design Analysis
 
 **ALWAYS STOP** after generating the report.

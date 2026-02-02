@@ -68,7 +68,15 @@ The `/finding` skill classifies what you found and tells you where to go next:
 - **Defect or Vulnerability?** Route to Fix: `/investigate` then `/rca-bugfix`
 - **Technical debt, gap, or drift?** Route to Design: `/design` then `/blueprint`
 
-This is where the [Findings Tracker](#the-findings-tracker) comes in — more on that below.
+Each downstream skill automatically updates the [Findings Tracker](#the-findings-tracker) with its stage transition:
+
+```
+Fix route:    /finding → /investigate → /rca-bugfix → /plan → implement → verify
+               Open    Investigating  RCA Complete  Planned  Resolved   Verified
+
+Design route: /finding → /design   → /blueprint     → /plan → implement → verify
+               Open     Designing  Blueprint Ready  Planned  Resolved   Verified
+```
 
 ---
 
@@ -166,15 +174,34 @@ ForgeKit processes the analysis and produces:
 The tracker lists all four findings sorted by severity, with auto-generated resolution tasks for each one:
 
 ```
-| # | Finding                    | Type   | Severity     | Status |
-|---|----------------------------|--------|--------------|--------|
-| F1 | State desynchronization   | Defect | **Critical** | Open   |
-| F3 | Download stall blind spot | Gap    | **High**     | Open   |
-| F2 | No external termination   | Gap    | **High**     | Open   |
-| F4 | Serial queue blocking     | Gap    | **Medium**   | Open   |
+| # | Finding                    | Type   | Severity     | Status | Stage |
+|---|----------------------------|--------|--------------|--------|-------|
+| F1 | State desynchronization   | Defect | **Critical** | Open   | Open  |
+| F3 | Download stall blind spot | Gap    | **High**     | Open   | Open  |
+| F2 | No external termination   | Gap    | **High**     | Open   | Open  |
+| F4 | Serial queue blocking     | Gap    | **Medium**   | Open   | Open  |
 ```
 
-Over the next few sessions, you work through the findings. Each `/session-end` updates the tracker. Each `/verify-session` confirms your progress was recorded. The tracker persists until all findings are resolved.
+Over the next few sessions, you work through the findings. Every downstream skill automatically updates the tracker as it processes a finding — you just follow the recommended next steps:
+
+```
+Session 1: /finding discovers F1, F2, F3, F4 → tracker created (all Stage: Open)
+
+Session 2: /investigate F1
+             → tracker: F1 Stage → Investigating, lifecycle row added
+           /rca-bugfix F1
+             → tracker: F1 Stage → RCA Complete, lifecycle row added
+
+Session 3: /plan (with F1 prompt)
+             → tracker: F1 Stage → Planned, lifecycle row added
+           Implement fix
+             → tracker: F1 Stage → Resolved
+
+Session 4: Verify fix in production
+             → tracker: F1 Stage → Verified ✓
+```
+
+Each `/session-end` reconciles the tracker with reality — if an artifact exists but the tracker wasn't updated (e.g., the skill ran before lifecycle tracking was added), session-end backfills the missing stages. Each `/verify-session` confirms everything is consistent.
 
 ---
 
@@ -182,27 +209,27 @@ Over the next few sessions, you work through the findings. Each `/session-end` u
 
 ### Reactive Skills
 
-| Skill | Command | What It Does |
-|-------|---------|-------------|
-| **watchdog** | `/watchdog {description}` | Monitors application logs in the background. When it spots trouble, it creates a structured JSON incident and (optionally) sends a Telegram alert. Think of it as a tireless intern watching your logs. |
-| **incident** | `/incident {description}` | Documents what happened — factual, neutral, timestamped. Can read watchdog JSON for automatic incident creation. Writes to `docs/incidents/`. |
-| **investigate** | `/investigate {report}` | Deep investigation into an incident or finding. Reads past incidents, RCAs, and findings to identify patterns. Produces hypotheses backed by evidence. Writes to `docs/investigations/`. |
-| **rca-bugfix** | `/rca-bugfix {issue}` | Root cause analysis and fix generation. Reads investigations and incidents, identifies the root cause chain, and produces both an RCA document and a ready-to-use fix prompt. Writes to `docs/RCAs/` and `docs/prompts/`. |
+| Skill | Command | What It Does | Tracker-Aware |
+|-------|---------|-------------|:---:|
+| **watchdog** | `/watchdog {description}` | Monitors application logs in the background. When it spots trouble, it creates a structured JSON incident and (optionally) sends a Telegram alert. Think of it as a tireless intern watching your logs. | — |
+| **incident** | `/incident {description}` | Documents what happened — factual, neutral, timestamped. Can read watchdog JSON for automatic incident creation. Writes to `docs/incidents/`. | — |
+| **investigate** | `/investigate {report}` | Deep investigation into an incident or finding. Reads past incidents, RCAs, and findings to identify patterns. Produces hypotheses backed by evidence. Writes to `docs/investigations/`. | ✓ → `Investigating` |
+| **rca-bugfix** | `/rca-bugfix {issue}` | Root cause analysis and fix generation. Reads investigations and incidents, identifies the root cause chain, and produces both an RCA document and a ready-to-use fix prompt. Writes to `docs/RCAs/` and `docs/prompts/`. | ✓ → `RCA Complete` |
 
 ### Proactive Skills
 
-| Skill | Command | What It Does |
-|-------|---------|-------------|
-| **research** | `/research {question}` | Researches a topic using web search, documentation, and codebase analysis. Produces a structured research document with findings, comparisons, and recommendations. Writes to `docs/research/`. |
-| **design** | `/design {mode} {topic}` | Architectural design analysis. Modes: `tradeoff` (compare approaches), `migrate` (plan a migration), `from-scratch` (design a new system). Writes to `docs/design/`. |
-| **blueprint** | `/blueprint {feature}` | Transforms research and design documents into a concrete implementation spec — files to create, APIs to define, tests to write. Generates a prompt for plan mode. Writes to `docs/blueprints/` and `docs/prompts/`. |
+| Skill | Command | What It Does | Tracker-Aware |
+|-------|---------|-------------|:---:|
+| **research** | `/research {question}` | Researches a topic using web search, documentation, and codebase analysis. Produces a structured research document with findings, comparisons, and recommendations. Writes to `docs/research/`. | — |
+| **design** | `/design {mode} {topic}` | Architectural design analysis. Modes: `tradeoff` (compare approaches), `migrate` (plan a migration), `from-scratch` (design a new system). Writes to `docs/design/`. | ✓ → `Designing` |
+| **blueprint** | `/blueprint {feature}` | Transforms research and design documents into a concrete implementation spec — files to create, APIs to define, tests to write. Generates a prompt for plan mode. Writes to `docs/blueprints/` and `docs/prompts/`. | ✓ → `Blueprint Ready` |
 
 ### Strategic Skills
 
-| Skill | Command | What It Does |
-|-------|---------|-------------|
-| **analyze** | `/analyze {mode} [scope]` | System-level analysis. Modes include `health`, `risk`, `patterns`, `component`, and more. Reads the entire operational history and codebase to produce assessments. Routes discoveries to the appropriate pipeline. Writes to `docs/analysis/`. |
-| **finding** | `/finding {description}` | Logs a proactive discovery — something found through analysis, review, or inspection. Classifies it by type and severity, writes a finding report, and auto-creates or updates a [Findings Tracker](#the-findings-tracker). Writes to `docs/findings/`. |
+| Skill | Command | What It Does | Tracker-Aware |
+|-------|---------|-------------|:---:|
+| **analyze** | `/analyze {mode} [scope]` | System-level analysis. Modes include `health`, `risk`, `patterns`, `component`, and more. Reads the entire operational history and codebase to produce assessments. Routes discoveries to the appropriate pipeline. Writes to `docs/analysis/`. | — |
+| **finding** | `/finding {description}` | Logs a proactive discovery — something found through analysis, review, or inspection. Classifies it by type and severity, writes a finding report, and auto-creates or updates a [Findings Tracker](#the-findings-tracker). Writes to `docs/findings/`. | ✓ Creates tracker |
 
 ---
 
@@ -245,14 +272,48 @@ ForgeKit auto-generates resolution tasks based on the finding type:
 
 When your finding reports contain specific code locations and root causes, the tasks are customized with those details.
 
+### Lifecycle Tracking
+
+Every finding is tracked from discovery through resolution. The tracker maintains two levels of granularity:
+
+- **Status** (coarse, 4 values): `Open` → `In Progress` → `Resolved` → `Verified`
+- **Stage** (fine-grained, 7 values): tracks exactly where in the pipeline a finding sits
+
+There are two stage progressions depending on the finding type:
+
+**Corrective Route** (Defect / Vulnerability — something's broken):
+```
+Open → Investigating → RCA Complete → Planned → Implementing → Resolved → Verified
+         /investigate    /rca-bugfix    /plan      (code work)   session-end  session-end
+```
+
+**Design Route** (Debt / Gap / Drift — something needs designing):
+```
+Open → Designing → Blueprint Ready → Planned → Implementing → Resolved → Verified
+        /design      /blueprint       /plan      (code work)   session-end  session-end
+```
+
+Every downstream skill that processes a finding **automatically updates the tracker** — setting the Stage, appending a lifecycle row, checking the resolution task, and adding a changelog entry. You don't need to update the tracker manually.
+
+Each finding's detail section includes a **Lifecycle table** that grows as the finding progresses:
+
+```
+| Stage          | Timestamp             | Session | Artifact                              |
+|----------------|-----------------------|---------|---------------------------------------|
+| Open           | 2026-02-02 16:00 UTC  | 119     | [Finding Report](docs/findings/...)   |
+| Investigating  | 2026-02-03 09:00 UTC  | 120     | [Investigation](docs/investigations/) |
+| RCA Complete   | 2026-02-03 11:00 UTC  | 120     | [RCA](docs/RCAs/) + [Prompt](docs/prompts/) |
+| Planned        | 2026-02-03 14:00 UTC  | 120     | [Plan](docs/plans/...)                |
+| Resolved       | 2026-02-04 10:00 UTC  | 121     | Commit abc123                         |
+| Verified       | 2026-02-04 15:00 UTC  | 121     | Production validation                 |
+```
+
 ### Cross-Session Persistence
 
 The tracker integrates with ForgeKit's session management:
 
-- **`/session-end`** checks all active trackers and updates any that had work done during the session — checking off completed tasks, updating statuses, adding changelog entries.
-- **`/verify-session`** reports on all active trackers — showing finding statuses, completed vs remaining tasks, and whether the tracker was properly updated.
-
-Status progression: `Open` --> `In Progress` --> `Resolved` --> `Verified`
+- **`/session-end`** checks all active trackers and updates any that had work done during the session — checking off completed tasks, updating statuses and stages, backfilling any missed lifecycle rows, and adding changelog entries.
+- **`/verify-session`** reports on all active trackers — showing finding statuses and stages, verifying stage consistency against existing artifacts, and flagging any lifecycle gaps.
 
 ### Naming Convention
 
@@ -405,7 +466,7 @@ Skills communicate through shared documents, not APIs. Here's what each skill re
 |----------|-----------|---------|
 | `docs/incidents/*.md` | `/incident` | `/investigate`, `/analyze` |
 | `docs/findings/*.md` | `/finding` | `/investigate`, `/analyze`, `/rca-bugfix`, `/research` |
-| `docs/findings/*_FINDINGS_TRACKER.md` | `/finding` | `/session-end`, `/verify-session` |
+| `docs/findings/*_FINDINGS_TRACKER.md` | `/finding` | `/investigate`, `/rca-bugfix`, `/design`, `/blueprint`, `/session-end`, `/verify-session` |
 | `docs/investigations/*.md` | `/investigate` | `/rca-bugfix`, `/analyze` |
 | `docs/RCAs/*.md` | `/rca-bugfix` | `/investigate`, `/analyze` |
 | `docs/research/*.md` | `/research` | `/investigate`, `/design`, `/blueprint` |

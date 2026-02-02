@@ -84,6 +84,48 @@ Based on the context usage:
 
 ---
 
+## Findings Tracker Update Protocol
+
+At the START of RCA, check if this work relates to a tracked finding:
+
+1. If input contains `F{N}` (e.g., "F1", "F3"), search `docs/findings/*_FINDINGS_TRACKER.md` for that finding
+2. If input is topic-based, search active trackers for a matching finding title
+3. If a match is found:
+   a. Read the tracker, finding report, and any linked investigation report
+   b. Use these as context for the RCA
+
+At the END of RCA (after writing the RCA + implementation prompt):
+
+1. Update the tracker's overview table: set `Stage` to `RCA Complete`, set `Status` to `In Progress`
+2. Update the per-finding **Lifecycle** table — append row:
+   ```
+   | RCA Complete | {YYYY-MM-DD HH:MM} UTC | {session} | [RCA]({rca_path}) + [Prompt]({prompt_path}) |
+   ```
+3. Check the resolution task: `[x] **FN.2**: RCA + fix design...`
+4. Add changelog entry:
+   ```
+   | {YYYY-MM-DD HH:MM} UTC | {session} | FN stage → RCA Complete. RCA: {rca_path}, Prompt: {prompt_path} |
+   ```
+5. Update `Last Updated` timestamp at top of tracker
+
+**HANDOFF UPDATE** — After the standard handoff message to the user, add:
+
+```
+Tracker updated: {tracker_path} — FN stage → RCA Complete
+
+After /plan completes, update the tracker:
+- Stage → Planned
+- Lifecycle row: `| Planned | {timestamp} | {session} | [Plan]({plan_path}) |`
+- Check task: `[x] **FN.3**: Implementation plan...`
+- Changelog: `FN stage → Planned. Plan: {plan_path}`
+```
+
+This ensures the tracker gets updated after /plan (which is EnterPlanMode and can't be modified directly).
+
+If no matching finding exists, proceed normally — not all RCAs originate from findings.
+
+---
+
 ## RCA Template
 
 When writing RCAs, use this structure:

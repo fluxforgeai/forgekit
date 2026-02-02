@@ -42,9 +42,28 @@ Session is ending. Please complete all session end tasks:
    - For each tracker that had findings-related work done this session (fixes, investigations, designs, or verification of FN tasks):
      - Update the checkbox status of any resolved tasks (e.g., `- [x] **F1.1**: ...`)
      - Update the finding's `Status` field (`Open` → `In Progress` → `Resolved` → `Verified`)
+     - Update the finding's `Stage` field to reflect the current pipeline position
      - Update `Resolved in session` / `Verified in session` fields with the session number
      - Add a row to the **Changelog** table with the date, session number, and what changed
      - Update the `Last Updated` timestamp at the top of the file
+
+   **Stage reconciliation** — Check if artifacts exist that the tracker doesn't yet reflect:
+     - Investigation report exists in `docs/investigations/` matching finding → Stage should be ≥ `Investigating`
+     - RCA exists in `docs/RCAs/` matching finding → Stage should be ≥ `RCA Complete`
+     - Design analysis exists in `docs/design/` matching finding → Stage should be ≥ `Designing`
+     - Blueprint exists in `docs/blueprints/` matching finding → Stage should be ≥ `Blueprint Ready`
+     - Plan exists in `docs/plans/` matching finding → Stage should be ≥ `Planned`
+     - Code changes committed for finding → Stage should be `Resolved`
+   If a stage was missed (artifact exists but no lifecycle row), backfill the lifecycle row with approximate timestamp.
+
+   **Output format** — Show Stage alongside Status:
+   ```
+   Findings Trackers:
+     {tracker_name}:
+       F1: {title} — Status: In Progress | Stage: RCA Complete
+       F2: {title} — Status: Open | Stage: Open
+   ```
+
    - If no findings work was done this session, skip this step
 
 **IMPORTANT**:
