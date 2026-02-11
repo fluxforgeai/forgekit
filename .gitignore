@@ -4,3 +4,19 @@ __pycache__/
 dist/
 build/
 .venv/
+
+# Tool caches
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# macOS
+.DS_Store
+
+# Environment
+.env
+.env.local
