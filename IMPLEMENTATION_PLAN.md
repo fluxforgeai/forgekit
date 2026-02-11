@@ -3,7 +3,15 @@
 **Version**: 0.1.0
 **Author**: Johan Genis (FluxForge AI)
 **Created**: 2026-01-26
-**Last Updated**: 2026-01-26
+**Last Updated**: 2026-02-11
+
+---
+
+## Quick Reference
+
+**Current Phase**: Phase 1+ (Dev Infrastructure) / Pre-Phase 2
+**Next Task**: Implement dev environment setup from blueprint (`docs/prompts/2026-02-11_1856_dev_environment_setup.md`)
+**Active Tracker**: `docs/findings/2026-02-11_1837_dev_environment_infrastructure_FINDINGS_TRACKER.md` (F1: Blueprint Ready)
 
 ---
 
@@ -136,7 +144,7 @@ These improvements apply across all phases:
 | Item | Description | Priority |
 |------|-------------|----------|
 | `/blueprint` skill | Design-to-spec bridge for proactive pipeline (DONE -- 2026-01-27) | DONE |
-| `/finding` skill | Audit pipeline entry point for proactive discoveries (Defect/Vulnerability/Debt/Gap/Drift classification) | High |
+| `/finding` skill | Audit pipeline entry point for proactive discoveries (DONE -- multiple sessions 2026-01-28 to 2026-02-10) | DONE |
 | Fix escalation in `/analyze` | Add "Corrective fix" option alongside Design Escalation in all analyze modes | High |
 | `/investigate` confirmation mode | Accept finding reports as input with abbreviated investigation for known causes | High |
 | Standardize handoff protocol | All 9 skills use consistent end format | High |
@@ -161,4 +169,58 @@ These improvements apply across all phases:
 
 ---
 
-**Plan Status**: Phase 1 Complete. Ready for GitHub push and Phase 2 planning.
+## Dev Environment Infrastructure (Cross-Phase)
+
+**Status**: In Progress (Blueprint Ready)
+**Goal**: Standardized development environment with quality gates, CI/CD, and Phase 2 workspace readiness.
+**Tracker**: `docs/findings/2026-02-11_1837_dev_environment_infrastructure_FINDINGS_TRACKER.md`
+
+| Step | Description | Status |
+|------|-------------|--------|
+| D.1 | Create `.venv` with uv, add dependency groups (dev/test) to pyproject.toml | ✅ DONE |
+| D.2 | Generate and commit `uv.lock` | ✅ DONE |
+| D.3 | Design tradeoff: single .venv vs multiple vs Docker | ✅ DONE (Option A: single .venv, score 97/105) |
+| D.4 | Blueprint: pre-commit, tests, CI, tool config | ✅ DONE |
+| D.5 | Add `[tool.ruff]`, `[tool.mypy]`, `[tool.pytest.ini_options]` to pyproject.toml | ⬜ |
+| D.6 | Create `.pre-commit-config.yaml` (ruff, uv-lock, mypy) | ⬜ |
+| D.7 | Create initial test suite (`tests/test_cli.py`, 6 tests) | ⬜ |
+| D.8 | Create `.github/workflows/ci.yml` (lint + test matrix 3.10-3.13) | ⬜ |
+| D.9 | Harden `.gitignore` (tool caches, macOS, coverage) | ⬜ |
+| D.10 | Verify all acceptance criteria pass | ⬜ |
+
+---
+
+## Session Progress Log
+
+### Session 1: 2026-02-11
+**Duration**: ~2.5 hours
+**Completed**:
+- [x] D.1: Created `.venv` named `forgekit` with `uv venv --prompt forgekit`
+- [x] D.2: Added `[dependency-groups]` (dev: ruff, mypy, pre-commit; test: pytest, pytest-cov)
+- [x] D.2: Generated `uv.lock` (23 packages, 120.6 KB)
+- [x] D.3: Design tradeoff analysis — 4 options, weighted scoring, Option A wins (97/105)
+- [x] D.4: Blueprint with exact file specs for 6 files + implementation prompt
+- [x] Finding F1 logged, tracker created, lifecycle: Open → Designing → Blueprint Ready
+
+**Key Decisions**:
+- Single `.venv` + uv dependency groups over multiple venvs or Docker (design analysis score 97 vs 68 vs 51)
+- uv as sole package manager (already in README, community consensus 2026)
+- Docker reserved for Phase 2 MCP server deployment only, not development
+- uv workspaces for Phase 2 monorepo (add `[tool.uv.workspace]` when `server/` materializes)
+
+**Artifacts Created**:
+- `docs/findings/2026-02-11_1837_missing_dev_environment_infrastructure.md` — F1 finding report
+- `docs/findings/2026-02-11_1837_dev_environment_infrastructure_FINDINGS_TRACKER.md` — Tracker
+- `docs/design/2026-02-11_1848_dev_environment_strategy.md` — Design analysis
+- `docs/blueprints/2026-02-11_1856_dev_environment_setup.md` — Blueprint
+- `docs/prompts/2026-02-11_1856_dev_environment_setup.md` — Implementation prompt
+
+**Next Session**:
+- Run `/plan` with prompt at `docs/prompts/2026-02-11_1856_dev_environment_setup.md`
+- Implement D.5-D.9 (tool config, pre-commit, tests, CI, .gitignore)
+- Verify acceptance criteria (D.10)
+- Commit all dev environment changes
+
+---
+
+**Plan Status**: Phase 1 Complete. Dev infrastructure in progress (Blueprint Ready). Ready for Phase 2 planning after dev env complete.

@@ -14,5 +14,16 @@ authors = [{name = "Johan Genis"}]
 [project.scripts]
 forgekit = "forgekit.cli:main"
 
+[dependency-groups]
+dev = [
+    "ruff",
+    "mypy",
+    "pre-commit",
+]
+test = [
+    "pytest",
+    "pytest-cov",
+]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/forgekit"]
